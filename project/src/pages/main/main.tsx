@@ -15,7 +15,7 @@ function Main(): JSX.Element {
   const {parkingList, authorizationStatus} = useAppSelector((state) => state);
   const [selectedPoint, setSelectedPoint] = useState(' ');
   const [popupState, setPopupState] = useState(false);
-console.log(authorizationStatus);
+  console.log(authorizationStatus);
   const onListParkingHover = (parkingId:string) :void =>{
     setSelectedPoint(parkingId);
   };

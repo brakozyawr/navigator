@@ -41,7 +41,7 @@ const ARRAY_TYPE = ['линейное', 'площадное'];
 const ARRAY_OWN = ['муниципальная', 'частная'];
 const ARRAY_AVAILABILITY = ['платная', 'бесплатная', 'условно бесплатная'];
 
-const ARRAY_TIME = ['12:00 - 18:00', '13:00 - 21:00', '00:00 - 23:59'];
+const ARRAY_TIME = ['12:00 - 18:00', '13:00 - 21:00', 'пн, ср, пт'];
 
 
 const LAT_MAX = 53.0651;
@@ -60,8 +60,8 @@ function createParking (itemNumber: number) {
   parkingLocation.longitude = getRandomFractionalNumber(LNG_MIN, LNG_MAX, 5);
   parkingLocation.zoom = ZOOM;
 
-  //parking.id = uuidv4();
-  parking.id = String(counter);
+  parking.id = uuidv4();
+  //parking.id = String(counter);
   parking.name = `Парковка ${ counter}`;
   parking.description = 'бла-бла-бла бла-бла бла-бла бла бла-бла-бла бла-бла бла-бла бла-бла-бла бла-бла бла-бла бла-бла-бла бла-бла бла-бла бла-бла-бла бла-бла бла-бла бла бла-бла-бла бла-бла бла-бла';
   parking.address = `Улица Лизюкова-${ counter } ${ counter + 10}`;

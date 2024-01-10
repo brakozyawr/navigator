@@ -10,7 +10,6 @@ import {fetchParkingListAction, checkAuthAction} from './store/api-actions';
 
 store.dispatch(fetchParkingListAction());
 store.dispatch(checkAuthAction());
-console.log('Приложенька загрузилась');
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,

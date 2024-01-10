@@ -6,7 +6,6 @@ import {
   requireAuthorization,
   setParkingListDataLoadingStatus,
   setError,
-  //sortByCity,
   redirectToRoute,
   loadParking,
   setParkingDataLoadingStatus
@@ -45,7 +44,12 @@ export const clearErrorAction = createAsyncThunk(
   },
 );*/
 
-let parkingList: TParking[] = [] as TParking[];
+const parkingList: TParking[] = createParkingList(20);
+
+
+localStorage.setItem('parkingList', JSON.stringify(parkingList));
+const saved = localStorage.getItem('parkingList');
+const initialValue = JSON.parse(saved);
 
 export const fetchParkingListAction = createAsyncThunk<void, undefined, {
   dispatch: AppDispatch;
@@ -55,12 +59,9 @@ export const fetchParkingListAction = createAsyncThunk<void, undefined, {
   'data/fetchOffers',
   (_arg, { dispatch, extra: api}) => {
     dispatch(setParkingListDataLoadingStatus(true));
-    const data = createParkingList(20);
-    parkingList = data;
-    //console.log(parkingList);
+    const data = parkingList;
     dispatch(setParkingListDataLoadingStatus(false));
     dispatch(loadParkingList(data));
-    //dispatch(sortByCity());
   },
 );
 
@@ -72,10 +73,10 @@ export const fetchParkingListAction = createAsyncThunk<void, undefined, {
 }>(
   'data/fetchOffer',
   async (id, {dispatch, extra: api}) => {
-    dispatch(setOfferDataLoadingStatus(true));
+    dispatch(setParkingDataLoadingStatus(true));
     const {data} = await api.get<TParking>(`${APIRoute.Room}${id}`);
-    dispatch(setOfferDataLoadingStatus(false));
-    dispatch(loadOffer(data));
+    dispatch(setParkingDataLoadingStatus(false));
+    dispatch(loadParking(data));
   },
 );*/
 
@@ -88,7 +89,6 @@ export const fetchParkingAction = createAsyncThunk<void, string, {
   (id, {dispatch, extra: api}) => {
     dispatch(setParkingDataLoadingStatus(true));
     const data = parkingList.find((item) => item.id === id);
-    //console.log(data);
     dispatch(loadParking(data));
     dispatch(setParkingDataLoadingStatus(false));
   },

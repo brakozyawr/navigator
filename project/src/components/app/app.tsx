@@ -11,8 +11,6 @@ import HistoryRouter from '../history-router/history-router';
 import browserHistory from '../../browser-history';
 
 
-
-
 const App = (): JSX.Element => {
 
   const {isParkingListDataLoading, authorizationStatus} = useAppSelector((state) => state);

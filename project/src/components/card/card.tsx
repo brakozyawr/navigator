@@ -38,7 +38,7 @@ const Card = ({parking, onMouseOverHandler, main}: CardProps): JSX.Element =>{
         </h2>
         <p className="place-card__type"><b>Тип расположения:</b> {parking.type}</p>
         <p className="place-card__type"><b>Доступность:</b> {parking.availability}</p>
-        {parking.isConditional && <p className="place-card__type"><b>Платно в интервале:</b> {parking.time}</p>}
+        {parking.isConditional && <p className="place-card__type"><b>График платной работы</b> {parking.time}</p>}
         {(parking.isConditional || Boolean(parking.price)) &&
           <div className="place-card__price-wrapper">
             <div className="place-card__price">

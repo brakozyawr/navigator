@@ -9,10 +9,12 @@ const FormReviews = (): JSX.Element => {
   const {currentParkingId} = useAppSelector((state) => state);
   //const dispatch = useAppDispatch();
   const [isDisabledSubmit, setDisabledSubmit] = useState(true);
+
   const [formData, setFormData] = useState({
     rating: '',
     comment: '',
   });
+
   const form = useRef<HTMLFormElement | null >(null);
 
   const fieldChangeHandle = (evt:ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {

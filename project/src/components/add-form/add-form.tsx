@@ -1,7 +1,8 @@
 //import {useAppDispatch} from '../../hooks';
 import './style.css';
-import {useEffect, useRef} from 'react';
-
+import {ChangeEvent, FormEvent, useEffect, useRef, useState} from 'react';
+import {TParking} from '../../types/types';
+import {v4 as uuidv4} from 'uuid';
 
 type AddFormProps = {
   setPopupState: (popupState: boolean) => void;
@@ -58,6 +59,122 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
 
   }, [setPopupState]);
 
+
+  const form = useRef<HTMLFormElement | null >(null);
+  const [isDisabledSubmit, setDisabledSubmit] = useState(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    address: '',
+    latitude: 0,
+    longitude: 0,
+    placeMax: 0,
+    type: 'линейное',
+    own: 'муниципальная',
+    availability: 'бесплатная',
+    isConditional: false,
+    isPayable: false,
+    time: '',
+    price: null,
+    rating: 0,
+  });
+
+
+  useEffect(() => {
+    let isDisabled = false;
+    const unchangeablePart = Boolean(formData.name && formData.address && formData.latitude && formData.longitude && formData.placeMax);
+
+    if(formData.isConditional){
+      isDisabled = Boolean(unchangeablePart && Boolean(formData.time) && formData.price);
+    }
+    if(formData.isPayable && !formData.isConditional ){
+      isDisabled = Boolean(unchangeablePart && formData.price);
+    }
+    if(!formData.isConditional && !formData.isPayable){
+      isDisabled = Boolean(unchangeablePart);
+    }
+
+    setDisabledSubmit(!isDisabled);
+  }, [formData]);
+
+  const fieldChangeHandle = (evt:ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement> | ChangeEvent<HTMLSelectElement>) => {
+    const {name, value} = evt.target;
+    setFormData({...formData, [name]: value});
+    //setFormData((prevState) => ({...prevState, [name]: value}));
+
+    if(name === 'availability' ){
+      if(value === 'платная'){
+        setFormData({...formData, isPayable: true, isConditional: false, time: ''});
+      }
+      if(value === 'условно бесплатная'){
+        setFormData({...formData, isConditional: true, isPayable: true});
+      }
+      if(value === 'бесплатная'){
+        setFormData({...formData, isConditional: false, isPayable: false, time: '', price: null });
+      }
+    }
+  };
+
+
+  const onSubmit = (parking: TParking) => {
+    //dispatch(addCommentAction(CommentData));
+    console.log(parking);
+  };
+
+
+  const resetForm = () => {
+    if(form.current){
+      form.current.reset();
+    }
+    setFormData({
+      name: '',
+      description: '',
+      address: '',
+      latitude: 0,
+      longitude: 0,
+      placeMax: 0,
+      type: 'линейное',
+      own: 'муниципальная',
+      availability: 'бесплатная',
+      isConditional: false,
+      isPayable: false,
+      time: '',
+      price: null,
+      rating: 0,
+    });
+    setDisabledSubmit(true);
+  };
+
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    if (formData.name && formData.address) {
+      onSubmit({
+        id: uuidv4(),
+        name: formData.name,
+        description: formData.description,
+        address: formData.address,
+        location: {
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+          zoom: 12,
+        },
+        placeMax: formData.placeMax,
+        type: formData.type,
+        own: formData.own,
+        availability: formData.availability,
+        isConditional: formData.availability === 'условно бесплатная' ,
+        time: formData.time,
+        price: Number(formData.price),
+        rating: formData.rating,
+      });
+    }
+
+    resetForm();
+  };
+
+
   return (
     <div className="modal is-active ">
       <div className="modal__wrapper">
@@ -71,97 +188,127 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
 
           <section className="notice">
             <h2 className="notice__title">Добавить парковку</h2>
-            <form className="ad-form" method="post" encType="multipart/form-data" autoComplete="off" action="#" noValidate >
-              <fieldset className="ad-form__element  ad-form__element--wide validate-element ">
-                <label className="ad-form__label" htmlFor="title">Наименование</label>
-                <input id="title" name="title" type="text" placeholder="Введите название" minLength={30}
-                  maxLength={100} autoFocus required
+            <form className="ad-form" method="post" encType="multipart/form-data" autoComplete="off" action="#" ref={form}
+              onSubmit={handleSubmit}
+              onReset={resetForm}
+            >
+              <fieldset className="ad-form__element  ad-form__element--wide ">
+                <label className="ad-form__label" htmlFor="name">Наименование</label>
+                <input id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Введите название"
+                  minLength={0}
+                  maxLength={100}
+                  autoFocus
+                  required
+                  onChange={fieldChangeHandle}
                 />
               </fieldset>
               <fieldset className="ad-form__element ">
                 <label className="ad-form__label" htmlFor="address">Адрес </label>
-                <input id="address" name="address" type="text" readOnly/>
+                <input id="address"
+                  name="address"
+                  type="text"
+                  onChange={fieldChangeHandle}
+                  required
+                />
               </fieldset>
-              <fieldset className="ad-form__element ">
+              <fieldset className="ad-form__element ad-form__element--double">
                 <label className="ad-form__label" htmlFor="location">Координаты</label>
-                <input id="location" name="location" type="text" readOnly/>
+                <input id="location"
+                  name="latitude"
+                  type="number"
+                  min={-180}
+                  max={180}
+                  step="any"
+                  placeholder="широта"
+                  required
+                  onChange={fieldChangeHandle}
+                />
+                <input
+                  name="longitude"
+                  type="number"
+                  min={-180}
+                  max={180}
+                  step="any"
+                  placeholder="долгота"
+                  required
+                  onChange={fieldChangeHandle}
+                />
               </fieldset>
-              <fieldset className="ad-form__element validate-element ">
+              <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="placeMax">Максимальное количество мест</label>
-                <input id="placeMax" name="placeMax" type="number" placeholder="0" min="0" max="100000" required />
+                <input id="placeMax"
+                  name="placeMax"
+                  type="number"
+                  //placeholder="0"
+                  min="0"
+                  max="100000"
+                  onChange={fieldChangeHandle}
+                  required
+                />
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="type">Тип расположения транспорта</label>
-                <select id="type" name="type">
-                  <option value="линейное" selected>линейное</option>
+                <select id="type" name="type" onChange={fieldChangeHandle}>
+                  <option value="линейное">линейное</option>
                   <option value="площадное">площадное</option>
                 </select>
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="own">Принадлежность:</label>
-                <select id="own" name="own">
-                  <option value="муниципальная" selected>муниципальная</option>
+                <select id="own" name="own" onChange={fieldChangeHandle}>
+                  <option value="муниципальная" >муниципальная</option>
                   <option value="частная">частная</option>
                 </select>
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="availability">Доступность:</label>
-                <select id="availability" name="availability">
-                  <option value="платная" selected>платная</option>
+                <select id="availability" name="availability" onChange={fieldChangeHandle}>
                   <option value="бесплатная">бесплатная</option>
+                  <option value="платная" >платная</option>
                   <option value="условно бесплатная">условно бесплатная</option>
                 </select>
               </fieldset>
-              <fieldset className="ad-form__element ad-form__element--time validate-element " disabled >
-                <label className="ad-form__label" htmlFor="timein">Платная в интервале</label>
-                <input id="timein" name="timein" type="time" placeholder="0" min="0" max="100000" required />
-                <input id="timeout" name="timeout" type="time" placeholder="0" min="0" max="100000" required />
+              <fieldset className="ad-form__element" disabled={!formData.isConditional}>
+                <label className="ad-form__label" htmlFor="time">График платной работы</label>
+                <input id="time"
+                  name="time"
+                  type="text"
+                  placeholder="например, сб, вс"
+                  min="0"
+                  max="100000"
+                  value={formData.time}
+                  required={formData.isConditional}
+                  onChange={fieldChangeHandle}
+                />
               </fieldset>
-              <fieldset className="ad-form__element validate-element ">
+              <fieldset className="ad-form__element" disabled={!formData.isPayable }>
                 <label className="ad-form__label" htmlFor="price">Цена за час, руб.</label>
-                <input id="price" name="price" type="number" placeholder="0" min="0" max="100000" required />
+                <input id="price"
+                  name="price"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  max="100000"
+                  value={String(formData.price)}
+                  required={formData.isPayable}
+                  onChange={fieldChangeHandle}
+                />
               </fieldset>
-              {/*<fieldset className="ad-form__element features">
-                <legend>Удобства: Wi-Fi, кухня, парковка, стиралка, лифт, кондиционер</legend>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature" value="wifi"
-                  id="feature-wifi"
-                />
-                <label className="features__label features__label--wifi" htmlFor="feature-wifi">Wi-Fi</label>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature" value="dishwasher"
-                  id="feature-dishwasher"
-                />
-                <label className="features__label features__label--dishwasher" htmlFor="feature-dishwasher">Посудомоечная
-                  машина
-                </label>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature" value="parking"
-                  id="feature-parking"
-                />
-                <label className="features__label features__label--parking" htmlFor="feature-parking">Парковка</label>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature" value="washer"
-                  id="feature-washer"
-                />
-                <label className="features__label features__label--washer" htmlFor="feature-washer">Стиральная
-                  машина
-                </label>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature" value="elevator"
-                  id="feature-elevator"
-                />
-                <label className="features__label features__label--elevator" htmlFor="feature-elevator">Лифт</label>
-                <input className="features__checkbox visually-hidden" type="checkbox" name="feature"
-                  value="conditioner" id="feature-conditioner"
-                />
-                <label className="features__label features__label--conditioner"
-                  htmlFor="feature-conditioner"
-                >Кондиционер
-                </label>
-              </fieldset>*/}
               <fieldset className="ad-form__element ad-form__element--wide">
                 <label className="ad-form__label" htmlFor="description">Описание (не обязательно)</label>
-                <textarea id="description" name="description" placeholder="Описание" />
+                <textarea id="description"
+                  name="description"
+                  placeholder="Описание"
+                  onChange={fieldChangeHandle}
+                />
               </fieldset>
               <fieldset className="ad-form__element ad-form__element--submit">
-                <button className="ad-form__submit" type="submit">Опубликовать</button>
-                 или <button className="ad-form__reset" type="reset"> очистить</button>
+                <button className="ad-form__submit" type="submit" disabled={isDisabledSubmit}>Опубликовать</button>
+                 или
+                <button className="ad-form__reset" type="reset"> очистить</button>
               </fieldset>
             </form>
           </section>
@@ -174,7 +321,7 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
               setPopupState(false);
             }}
           >
-            крестик
+            ×
           </button>
         </div>
       </div>
