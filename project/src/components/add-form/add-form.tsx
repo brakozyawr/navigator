@@ -3,7 +3,7 @@ import './style.css';
 import {ChangeEvent, FormEvent, useEffect, useRef, useState} from 'react';
 import {TParking} from '../../types/types';
 import {v4 as uuidv4} from 'uuid';
-import {addParkingAction} from '../../store/api-actions';
+import {addParkingAction, editParkingAction} from '../../store/api-actions';
 
 type AddFormProps = {
   setPopupState: (popupState: boolean) => void;
@@ -93,7 +93,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
     if(!formData.isConditional && !formData.isPayable){
       isDisabled = Boolean(unchangeablePart);
     }
-
+    console.log(formData);
     setDisabledSubmit(!isDisabled);
   }, [formData]);
 
@@ -116,8 +116,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
 
 
   const onSubmit = (parking: TParking) => {
-    dispatch(addParkingAction(parking));
-    //dispatch(editParkingAction(currentParking.id));
+    editElement ? dispatch(editParkingAction(parking)) : dispatch(addParkingAction(parking));
   };
 
 
@@ -148,28 +147,27 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    if (formData.name && formData.address) {
-      onSubmit({
-        id: editElement ? editElement.id : uuidv4(),
-        name: formData.name,
-        description: formData.description,
-        address: formData.address,
-        location: {
-          latitude: formData.latitude,
-          longitude: formData.longitude,
-          zoom: 12,
-        },
-        placeMax: formData.placeMax,
-        type: formData.type,
-        own: formData.own,
-        availability: formData.availability,
-        isConditional: formData.availability === 'условно бесплатная' ,
-        time: formData.time,
-        price: Number(formData.price),
-        rating: formData.rating,
-      });
-    }
+    onSubmit({
+      id: editElement ? editElement.id : uuidv4(),
+      name: formData.name,
+      description: formData.description,
+      address: formData.address,
+      location: {
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        zoom: 12,
+      },
+      placeMax: formData.placeMax,
+      type: formData.type,
+      own: formData.own,
+      availability: formData.availability,
+      isConditional: formData.availability === 'условно бесплатная' ,
+      time: formData.time,
+      price: Number(formData.price),
+      rating: formData.rating,
+    });
 
+    console.log(['Отзравляем формдата', formData]);
     resetForm();
   };
 
@@ -186,7 +184,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
         <div className="modal__content" ref={modal}>
 
           <section className="notice">
-            <h2 className="notice__title">Добавить парковку</h2>
+            <h2 className="notice__title">{editElement ? 'Редактировать информацию о парковке' : 'Добавить парковку'}</h2>
             <form className="ad-form" method="post" encType="multipart/form-data" autoComplete="off" action="#" ref={form}
               onSubmit={handleSubmit}
               onReset={resetForm}
@@ -195,6 +193,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="name">Наименование</label>
                 <input id="name"
                   name="name"
+                  value={formData.name}
                   type="text"
                   placeholder="Введите название"
                   minLength={0}
@@ -208,6 +207,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="address">Адрес </label>
                 <input id="address"
                   name="address"
+                  value={formData.address}
                   type="text"
                   onChange={fieldChangeHandle}
                   required
@@ -217,6 +217,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="location">Координаты</label>
                 <input id="location"
                   name="latitude"
+                  value={formData.latitude}
                   type="number"
                   min={-180}
                   max={180}
@@ -227,6 +228,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 />
                 <input
                   name="longitude"
+                  value={formData.longitude}
                   type="number"
                   min={-180}
                   max={180}
@@ -240,8 +242,8 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="placeMax">Максимальное количество мест</label>
                 <input id="placeMax"
                   name="placeMax"
+                  value={formData.placeMax}
                   type="number"
-                  //placeholder="0"
                   min="0"
                   max="100000"
                   onChange={fieldChangeHandle}
@@ -250,21 +252,21 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="type">Тип расположения транспорта</label>
-                <select id="type" name="type" onChange={fieldChangeHandle}>
+                <select id="type" name="type" onChange={fieldChangeHandle} value={formData.type}>
                   <option value="линейное">линейное</option>
                   <option value="площадное">площадное</option>
                 </select>
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="own">Принадлежность:</label>
-                <select id="own" name="own" onChange={fieldChangeHandle}>
+                <select id="own" name="own" onChange={fieldChangeHandle} value={formData.own}>
                   <option value="муниципальная" >муниципальная</option>
                   <option value="частная">частная</option>
                 </select>
               </fieldset>
               <fieldset className="ad-form__element">
                 <label className="ad-form__label" htmlFor="availability">Доступность:</label>
-                <select id="availability" name="availability" onChange={fieldChangeHandle}>
+                <select id="availability" name="availability" onChange={fieldChangeHandle} value={formData.availability}>
                   <option value="бесплатная">бесплатная</option>
                   <option value="платная" >платная</option>
                   <option value="условно бесплатная">условно бесплатная</option>
@@ -274,11 +276,11 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="time">График платной работы</label>
                 <input id="time"
                   name="time"
+                  value={formData.time}
                   type="text"
                   placeholder="например, сб, вс"
                   min="0"
                   max="100000"
-                  value={formData.time}
                   required={formData.isConditional}
                   onChange={fieldChangeHandle}
                 />
@@ -287,11 +289,11 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="price">Цена за час, руб.</label>
                 <input id="price"
                   name="price"
+                  value={String(formData.price)}
                   type="number"
                   placeholder="0"
                   min="0"
                   max="100000"
-                  value={String(formData.price)}
                   required={formData.isPayable}
                   onChange={fieldChangeHandle}
                 />
@@ -300,6 +302,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="description">Описание (не обязательно)</label>
                 <textarea id="description"
                   name="description"
+                  value={formData.description}
                   placeholder="Описание"
                   onChange={fieldChangeHandle}
                 />

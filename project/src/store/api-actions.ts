@@ -48,10 +48,10 @@ export const clearErrorAction = createAsyncThunk(
 function useLocalStorage(){
   let saved = localStorage.getItem('parkingList');
 
-  if(saved){
+  if(saved && (JSON.parse(saved) !== '[]')){
     return JSON.parse(saved) as TParking[];
   }else{
-    const parkingList: TParking[] = createParkingList(20);
+    const parkingList: TParking[] = createParkingList(25);
     localStorage.setItem('parkingList', JSON.stringify(parkingList));
     saved = localStorage.getItem('parkingList') as string;
     return JSON.parse(saved) as TParking[];
@@ -151,6 +151,7 @@ export const addParkingAction = createAsyncThunk<void, TParking, {
 }>(
   'user/addParking',
   (parking, {dispatch, extra: api}) => {
+    console.log('добавка!!!');
     const parkingList = useLocalStorage();
     parkingList.unshift(parking);
     localStorage.setItem('parkingList', JSON.stringify(parkingList));
@@ -184,6 +185,8 @@ export const editParkingAction = createAsyncThunk<void, TParking, {
 }>(
   'user/editParking',
   (editElement, {dispatch, extra: api}) => {
+    console.log('меняем все!!!');
+    console.log(editElement);
     const parkingList = useLocalStorage();
 
     const editElementIndex = parkingList.findIndex ((item) => item.id === editElement.id);
