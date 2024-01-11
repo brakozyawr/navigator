@@ -193,6 +193,7 @@ export const editParkingAction = createAsyncThunk<void, TParking, {
 
     const data = useLocalStorage();
     dispatch(loadParkingList(data));
+    dispatch(loadParking(editElement));
   },
 );
 

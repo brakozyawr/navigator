@@ -4,7 +4,6 @@ import {AppRoute} from '../../const';
 import {TParking} from '../../types/types';
 import {convertRating} from '../../util';
 import {useAppDispatch} from '../../hooks';
-import {setCurrentParkingId} from '../../store/action';
 import {deleteParkingAction} from '../../store/api-actions';
 
 type CardProps = {
@@ -30,11 +29,7 @@ const Card = ({parking, onMouseOverHandler, main}: CardProps): JSX.Element =>{
             <span className="visually-hidden">Rating</span>
           </div>
         </div>
-        <h2 className="place-card__name"
-          onClick={() => {
-            dispatch(setCurrentParkingId(parking.id));
-          }}
-        >
+        <h2 className="place-card__name">
           <Link to={`${AppRoute.Details}${parking.id}`}>{parking.name}</Link>
         </h2>
         <p className="place-card__type"><b>Тип расположения:</b> {parking.type}</p>

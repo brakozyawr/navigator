@@ -95,11 +95,11 @@ const CardDetails = (): JSX.Element => {
               </ul>
               {Boolean(currentParking.price) &&
                 <div className="property__price">
-                  <b className="property__price-value">{currentParking.price}</b>
-                  <span className="property__price-text"> ₽&nbsp;час</span>
+                  <b className="property__price-value">₽ {currentParking.price}</b>
+                  <span className="property__price-text"> &nbsp;час</span>
                 </div>}
               <div className="property__host">
-                <h2 className="property__host-title">Описание</h2>
+                {currentParking.description && <h2 className="property__host-title">Описание</h2>}
                 <div className="property__description">
                   <p className="property__text">
                     {currentParking.description}

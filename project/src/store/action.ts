@@ -3,12 +3,6 @@ import {TParking} from '../types/types';
 import {AppRoute, AuthorizationStatus} from '../const';
 
 
-export const setCurrentParkingId = createAction('data/setCurrentParkingId',
-  (value: string) => ({
-    payload: value,
-  })
-);
-
 export const loadParkingList = createAction<TParking[]>('data/loadParkingList');
 export const loadParking = createAction<TParking | undefined>('data/loadParking');
 
