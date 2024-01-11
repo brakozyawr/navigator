@@ -90,7 +90,7 @@ const CardDetails = (): JSX.Element => {
                 </li>
                 {currentParking.isConditional &&
                   <li className="property__feature ">
-                    <b>График платной работы:</b> {currentParking.type}
+                    <b>График платной работы:</b> {currentParking.time}
                   </li>}
               </ul>
               {Boolean(currentParking.price) &&

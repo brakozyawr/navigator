@@ -59,21 +59,21 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
 
   }, [setPopupState]);
 
-
+  //console.log(editElement);
   const form = useRef<HTMLFormElement | null >(null);
   const [isDisabledSubmit, setDisabledSubmit] = useState(true);
   const [formData, setFormData] = useState({
     name: editElement ? editElement.name : '',
     description: editElement ? editElement.description : '',
     address: editElement ? editElement.address : '',
-    latitude: editElement ? editElement.location.latitude : 0,
-    longitude: editElement ? editElement.location.longitude : 0,
-    placeMax: editElement ? editElement.placeMax : 0,
+    latitude: editElement ? editElement.location.latitude : null,
+    longitude: editElement ? editElement.location.longitude : null,
+    placeMax: editElement ? editElement.placeMax : null,
     type: editElement ? editElement.type : 'линейное',
     own: editElement ? editElement.own : 'муниципальная',
     availability: editElement ? editElement.availability : 'бесплатная',
     isConditional: editElement ? editElement.isConditional : false,
-    isPayable: !!(editElement && (editElement.isConditional || Boolean(editElement.price))),
+    isPayable: editElement ? (editElement.availability === 'платная') : false,
     time: editElement ? editElement.time : '',
     price: editElement ? editElement.price : null,
     rating: editElement ? editElement.rating : 0,
@@ -87,13 +87,13 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
     if(formData.isConditional){
       isDisabled = Boolean(unchangeablePart && Boolean(formData.time) && formData.price);
     }
-    if(formData.isPayable && !formData.isConditional ){
+    if(formData.isPayable /*&& !formData.isConditional*/ ){
       isDisabled = Boolean(unchangeablePart && formData.price);
     }
     if(!formData.isConditional && !formData.isPayable){
       isDisabled = Boolean(unchangeablePart);
     }
-    console.log(formData);
+
     setDisabledSubmit(!isDisabled);
   }, [formData]);
 
@@ -103,13 +103,13 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
 
     if(name === 'availability' ){
       if(value === 'платная'){
-        setFormData({...formData, isPayable: true, isConditional: false, time: ''});
+        setFormData({...formData, availability: value, isPayable: true, isConditional: false, time: ''});
       }
       if(value === 'условно бесплатная'){
-        setFormData({...formData, isConditional: true, isPayable: true});
+        setFormData({...formData, availability: value, isConditional: true, isPayable: false});
       }
       if(value === 'бесплатная'){
-        setFormData({...formData, isConditional: false, isPayable: false, time: '', price: null });
+        setFormData({...formData, availability: value, isConditional: false, isPayable: false, time: '', price: null });
       }
     }
   };
@@ -117,6 +117,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
 
   const onSubmit = (parking: TParking) => {
     editElement ? dispatch(editParkingAction(parking)) : dispatch(addParkingAction(parking));
+    setPopupState(false);
   };
 
 
@@ -153,21 +154,21 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
       description: formData.description,
       address: formData.address,
       location: {
-        latitude: formData.latitude,
-        longitude: formData.longitude,
+        latitude: Number(formData.latitude),
+        longitude: Number(formData.longitude),
         zoom: 12,
       },
-      placeMax: formData.placeMax,
+      placeMax: Number(formData.placeMax),
       type: formData.type,
       own: formData.own,
       availability: formData.availability,
-      isConditional: formData.availability === 'условно бесплатная' ,
+      //isConditional: formData.availability === 'условно бесплатная',
+      isConditional: formData.isConditional ,
       time: formData.time,
       price: Number(formData.price),
       rating: formData.rating,
     });
 
-    console.log(['Отзравляем формдата', formData]);
     resetForm();
   };
 
@@ -217,7 +218,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="location">Координаты</label>
                 <input id="location"
                   name="latitude"
-                  value={formData.latitude}
+                  value={String(formData.latitude)}
                   type="number"
                   min={-180}
                   max={180}
@@ -228,7 +229,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 />
                 <input
                   name="longitude"
-                  value={formData.longitude}
+                  value={String(formData.longitude)}
                   type="number"
                   min={-180}
                   max={180}
@@ -242,7 +243,7 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                 <label className="ad-form__label" htmlFor="placeMax">Максимальное количество мест</label>
                 <input id="placeMax"
                   name="placeMax"
-                  value={formData.placeMax}
+                  value={String(formData.placeMax)}
                   type="number"
                   min="0"
                   max="100000"
@@ -285,16 +286,16 @@ const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
                   onChange={fieldChangeHandle}
                 />
               </fieldset>
-              <fieldset className="ad-form__element" disabled={!formData.isPayable }>
+              <fieldset className="ad-form__element" disabled={!(formData.isPayable || formData.isConditional)}>
                 <label className="ad-form__label" htmlFor="price">Цена за час, руб.</label>
                 <input id="price"
                   name="price"
                   value={String(formData.price)}
                   type="number"
-                  placeholder="0"
+                  //placeholder="0"
                   min="0"
                   max="100000"
-                  required={formData.isPayable}
+                  required={formData.isPayable || formData.isConditional}
                   onChange={fieldChangeHandle}
                 />
               </fieldset>

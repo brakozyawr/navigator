@@ -1,9 +1,6 @@
 import cn from 'classnames';
 import {TParking} from '../../types/types';
 import Card from '../card/card';
-import {useEffect} from 'react';
-//import { sortByCity, sortByFilter} from '../../store/action';
-//import {useAppDispatch} from '../../hooks';
 
 
 type CardListProps = {
@@ -14,7 +11,6 @@ type CardListProps = {
 
 const CardList = ({parkingList, onListParkingHover, main}: CardListProps): JSX.Element => {
 
-  //const dispatch = useAppDispatch();
   const className = cn(
     'places__list',
     {'cities__places-list': main,
@@ -28,11 +24,6 @@ const CardList = ({parkingList, onListParkingHover, main}: CardListProps): JSX.E
       onListParkingHover(id);
     }
   };
-
-  useEffect(() => {
-    //dispatch(sortByCity());
-    //dispatch(sortByFilter());
-  }, []);
 
   return (
     <div className={className}>
