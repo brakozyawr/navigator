@@ -34,7 +34,7 @@ export const clearErrorAction = createAsyncThunk(
   state: State;
   extra: AxiosInstance;
 }>(
-  'data/fetchOffers',
+  'data/fetchParkingList',
   async (_arg, { dispatch, extra: api}) => {
     dispatch(setOffersDataLoadingStatus(true));
     const {data} = await api.get<TCard[]>(APIRoute.Main);
@@ -44,22 +44,29 @@ export const clearErrorAction = createAsyncThunk(
   },
 );*/
 
-const parkingList: TParking[] = createParkingList(20);
 
+function useLocalStorage(){
+  let saved = localStorage.getItem('parkingList');
 
-localStorage.setItem('parkingList', JSON.stringify(parkingList));
-const saved = localStorage.getItem('parkingList');
-const initialValue = JSON.parse(saved);
+  if(saved){
+    return JSON.parse(saved) as TParking[];
+  }else{
+    const parkingList: TParking[] = createParkingList(20);
+    localStorage.setItem('parkingList', JSON.stringify(parkingList));
+    saved = localStorage.getItem('parkingList') as string;
+    return JSON.parse(saved) as TParking[];
+  }
+}
 
 export const fetchParkingListAction = createAsyncThunk<void, undefined, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
-  'data/fetchOffers',
+  'data/fetchParkingList',
   (_arg, { dispatch, extra: api}) => {
     dispatch(setParkingListDataLoadingStatus(true));
-    const data = parkingList;
+    const data = useLocalStorage();
     dispatch(setParkingListDataLoadingStatus(false));
     dispatch(loadParkingList(data));
   },
@@ -71,7 +78,7 @@ export const fetchParkingListAction = createAsyncThunk<void, undefined, {
   state: State;
   extra: AxiosInstance;
 }>(
-  'data/fetchOffer',
+  'data/fetchParking',
   async (id, {dispatch, extra: api}) => {
     dispatch(setParkingDataLoadingStatus(true));
     const {data} = await api.get<TParking>(`${APIRoute.Room}${id}`);
@@ -85,10 +92,10 @@ export const fetchParkingAction = createAsyncThunk<void, string, {
   state: State;
   extra: AxiosInstance;
 }>(
-  'data/fetchOffer',
+  'data/fetchParking',
   (id, {dispatch, extra: api}) => {
     dispatch(setParkingDataLoadingStatus(true));
-    const data = parkingList.find((item) => item.id === id);
+    const data = useLocalStorage().find((item) => item.id === id);
     dispatch(loadParking(data));
     dispatch(setParkingDataLoadingStatus(false));
   },
@@ -137,15 +144,56 @@ export const logoutAction = createAsyncThunk<void, undefined, {
   },
 );
 
-/*export const addCommentAction = createAsyncThunk<void, TComment, {
+export const addParkingAction = createAsyncThunk<void, TParking, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
-  'user/addComment',
-  async ({comment,rating, id}, {dispatch, extra: api}) => {
-    await api.post<TComment>(`${APIRoute.Comment}${id}`, {comment, rating});
-    const {data} = await api.get<TReview[]>(`${APIRoute.Comment}${id}`);
-    dispatch(loadReviews(data));
+  'user/addParking',
+  (parking, {dispatch, extra: api}) => {
+    const parkingList = useLocalStorage();
+    parkingList.unshift(parking);
+    localStorage.setItem('parkingList', JSON.stringify(parkingList));
+
+    const data = useLocalStorage();
+    dispatch(loadParkingList(data));
   },
-);*/
+);
+
+export const deleteParkingAction = createAsyncThunk<void, string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'user/deleteParking',
+  (id, {dispatch, extra: api}) => {
+    const parkingList = useLocalStorage();
+    const deleteElementIndex = parkingList.findIndex ((item) => item.id === id);
+    parkingList.splice(deleteElementIndex, 1);
+    localStorage.setItem('parkingList', JSON.stringify(parkingList));
+
+    const data = useLocalStorage();
+    dispatch(loadParkingList(data));
+  },
+);
+
+export const editParkingAction = createAsyncThunk<void, TParking, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'user/editParking',
+  (editElement, {dispatch, extra: api}) => {
+    const parkingList = useLocalStorage();
+
+    const editElementIndex = parkingList.findIndex ((item) => item.id === editElement.id);
+    parkingList.splice(editElementIndex, 1);
+    parkingList.unshift(editElement);
+    localStorage.setItem('parkingList', JSON.stringify(parkingList));
+
+    const data = useLocalStorage();
+    dispatch(loadParkingList(data));
+  },
+);
+
+

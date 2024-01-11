@@ -32,9 +32,9 @@ const CURRENT_CITY = {
   zoom: 11,
 };
 
-function Map({points, /*selectedCity,*/ selectedPoint, main, currentParkingLocation}:MapProps): JSX.Element {
+function Map({points, selectedPoint, main, currentParkingLocation}:MapProps): JSX.Element {
 
-  const currentCity: TCity = CURRENT_CITY;
+  const currentCity: TCity = currentParkingLocation ? currentParkingLocation : CURRENT_CITY;
 
   const mapRef = useRef(null);
   const map = useMap(mapRef, currentCity);

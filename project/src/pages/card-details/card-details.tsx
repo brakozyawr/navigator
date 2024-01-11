@@ -2,24 +2,25 @@ import Map from '../../components/map/map';
 import {useAppDispatch, useAppSelector} from '../../hooks';
 import Header from '../../components/header/header';
 import {convertRating} from '../../util';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import NotFound from '../not-found/not-found';
-import {fetchParkingAction} from '../../store/api-actions';
+import {deleteParkingAction, fetchParkingAction} from '../../store/api-actions';
 import LoadingScreen from '../loading-screen/loading-screen';
 import {loadParking} from '../../store/action';
-import {useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
+import {AppRoute} from '../../const';
+import AddForm from '../../components/add-form/add-form';
 
 
 const CardDetails = (): JSX.Element => {
   const {currentParking, isParkingDataLoading} = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const params = useParams<{id: string}>();
-  //console.log(params.id);
-  //console.log(currentParking);
+  const [popupState, setPopupState] = useState(false);
+
   useEffect(() => {
     if (params.id) {
       dispatch(fetchParkingAction(params.id));
-      //console.log(currentParking);
     }
     return () => {
       dispatch(loadParking(undefined));
@@ -35,6 +36,24 @@ const CardDetails = (): JSX.Element => {
   return !currentParking ? <NotFound/> : (
     <div className="page">
       <Header/>
+      <div className="container">
+        <Link to={AppRoute.Root}
+          className="btn btn--purple product-card__btn"
+          type="button"
+          onClick={() => {
+            dispatch(deleteParkingAction(currentParking.id));
+          }}
+        >Удалить
+        </Link>
+        <button
+          className="btn btn--purple product-card__btn"
+          type="button"
+          onClick={() => {
+            setPopupState(true);
+          }}
+        >Редактировать
+        </button>
+      </div>
       <main className="page__main page__main--property">
         <section className="property">
           <div className="property__container container">
@@ -90,13 +109,13 @@ const CardDetails = (): JSX.Element => {
             </div>
           </div>
           <Map
-            //selectedCity={currentOffer.location}
             currentParkingLocation={currentParking.location}
             points={[currentParking]}
             main={false}
           />
         </section>
       </main>
+      {popupState && <AddForm setPopupState={setPopupState} editElement={currentParking} />}
     </div>
   );
 };

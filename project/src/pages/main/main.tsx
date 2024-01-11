@@ -11,11 +11,10 @@ import AddForm from '../../components/add-form/add-form';
 
 function Main(): JSX.Element {
 
-  //const {offerListSortedByCity, city, offerListSortedByFilter} = useAppSelector((state) => state);
   const {parkingList, authorizationStatus} = useAppSelector((state) => state);
   const [selectedPoint, setSelectedPoint] = useState(' ');
   const [popupState, setPopupState] = useState(false);
-  console.log(authorizationStatus);
+
   const onListParkingHover = (parkingId:string) :void =>{
     setSelectedPoint(parkingId);
   };
@@ -44,7 +43,7 @@ function Main(): JSX.Element {
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Parking</h2>
-              <b className="places__found">{parkingList.length} мест для парковки </b>
+              <b className="places__found">Мест для парковки: {parkingList.length} </b>
               <CardList
                 parkingList={parkingList}
                 onListParkingHover={onListParkingHover}
@@ -53,7 +52,6 @@ function Main(): JSX.Element {
             </section>
             <div className="cities__right-section">
               <Map
-                //selectedCity={CITY[city]}
                 points={parkingList}
                 selectedPoint={selectedPoint}
                 main

@@ -1,17 +1,17 @@
-//import {useAppDispatch} from '../../hooks';
+import {useAppDispatch} from '../../hooks';
 import './style.css';
 import {ChangeEvent, FormEvent, useEffect, useRef, useState} from 'react';
 import {TParking} from '../../types/types';
 import {v4 as uuidv4} from 'uuid';
+import {addParkingAction} from '../../store/api-actions';
 
 type AddFormProps = {
   setPopupState: (popupState: boolean) => void;
+  editElement?: TParking;
 }
 
-const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
-//const className = main ? 'cities' : 'near-places';
-//const dispatch = useAppDispatch();
-
+const AddForm = ({setPopupState, editElement} : AddFormProps): JSX.Element => {
+  const dispatch = useAppDispatch();
   const modal = useRef<HTMLDivElement | null >(null);
 
   useEffect(() => {
@@ -63,20 +63,20 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
   const form = useRef<HTMLFormElement | null >(null);
   const [isDisabledSubmit, setDisabledSubmit] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    address: '',
-    latitude: 0,
-    longitude: 0,
-    placeMax: 0,
-    type: 'линейное',
-    own: 'муниципальная',
-    availability: 'бесплатная',
-    isConditional: false,
-    isPayable: false,
-    time: '',
-    price: null,
-    rating: 0,
+    name: editElement ? editElement.name : '',
+    description: editElement ? editElement.description : '',
+    address: editElement ? editElement.address : '',
+    latitude: editElement ? editElement.location.latitude : 0,
+    longitude: editElement ? editElement.location.longitude : 0,
+    placeMax: editElement ? editElement.placeMax : 0,
+    type: editElement ? editElement.type : 'линейное',
+    own: editElement ? editElement.own : 'муниципальная',
+    availability: editElement ? editElement.availability : 'бесплатная',
+    isConditional: editElement ? editElement.isConditional : false,
+    isPayable: !!(editElement && (editElement.isConditional || Boolean(editElement.price))),
+    time: editElement ? editElement.time : '',
+    price: editElement ? editElement.price : null,
+    rating: editElement ? editElement.rating : 0,
   });
 
 
@@ -100,7 +100,6 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
   const fieldChangeHandle = (evt:ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement> | ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = evt.target;
     setFormData({...formData, [name]: value});
-    //setFormData((prevState) => ({...prevState, [name]: value}));
 
     if(name === 'availability' ){
       if(value === 'платная'){
@@ -117,8 +116,8 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
 
 
   const onSubmit = (parking: TParking) => {
-    //dispatch(addCommentAction(CommentData));
-    console.log(parking);
+    dispatch(addParkingAction(parking));
+    //dispatch(editParkingAction(currentParking.id));
   };
 
 
@@ -151,7 +150,7 @@ const AddForm = ({setPopupState} : AddFormProps): JSX.Element => {
 
     if (formData.name && formData.address) {
       onSubmit({
-        id: uuidv4(),
+        id: editElement ? editElement.id : uuidv4(),
         name: formData.name,
         description: formData.description,
         address: formData.address,

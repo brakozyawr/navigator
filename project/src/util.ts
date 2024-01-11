@@ -1,12 +1,12 @@
-import {TParking} from './types/types';
-import {Filter} from './const';
+//import {TParking} from './types/types';
+//import {Filter} from './const';
 
 export const convertRating = (rating:number) => {
   const widtth = `${Math.round(rating) * 20 }%`;
   return {width: widtth};
 };
 
-export const sortParkingList = function(parkingList: TParking[], currentFilter: string): TParking[] {
+/*export const sortParkingList = function(parkingList: TParking[], currentFilter: string): TParking[] {
   const sortedParking = parkingList.slice();
   switch (currentFilter) {
     case Filter.PriceUp:
@@ -22,6 +22,6 @@ export const sortParkingList = function(parkingList: TParking[], currentFilter: 
       return sortedParking;
   }
   return sortedParking;
-};
+};*/
 
 

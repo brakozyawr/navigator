@@ -116,6 +116,24 @@ body {
   right: 0;
   z-index: 1;
 }
+
+.place-card .cross-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  padding: 0;
+  line-height: 0;
+  width: 15px;
+  height: 15px;
+  font-size: 10px;
+  cursor: pointer;
+  background-color: #f88e03;
+  border: none;
+  border-radius: 2px;
+  color: #fff;
+}
+
 .modal__btn {
   margin-top: 16px;
 }
@@ -175,7 +193,8 @@ body {
 
 .btn--purple {
   color: #ffffff;
-  background-color: #7575e2;
+  background-color: #f88e03;
+  margin: 0 10px 5px;
 }
 
 .btn--purple:disabled {
