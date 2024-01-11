@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
-
-//import {CITY} from '../../const';
 import CardList from '../../components/card-list/card-list';
 import Header from '../../components/header/header';
 import Map from '../../components/map/map';
 import {useAppSelector} from '../../hooks';
 import MainEmpty from '../main-empty/main-empty';
 import AddForm from '../../components/add-form/add-form';
+import {AuthorizationStatus} from '../../const';
 
 
 function Main(): JSX.Element {
@@ -26,7 +25,7 @@ function Main(): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <Header/>
-      {authorizationStatus &&
+      {authorizationStatus === AuthorizationStatus.Auth &&
         <div className="container">
           <button
             className="btn btn--purple product-card__btn"
