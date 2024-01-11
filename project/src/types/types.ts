@@ -30,29 +30,6 @@ export type TCity = {
   zoom: number;
 };
 
-export type TCities = {
-  [propertyName: string]: TCity;
-};
-
-export type TReview ={
-  comment: string;
-  date: string;
-  id: number;
-  rating: number;
-  user: {
-    avatarUrl: string;
-    id: number;
-    isPro: boolean;
-    name: string;
-  };
-}
-
-export type TComment ={
-  comment: string;
-  rating: number;
-  id: string;
-}
-
 export type AuthData = {
   login: string;
   password: string;
