@@ -151,7 +151,6 @@ export const addParkingAction = createAsyncThunk<void, TParking, {
 }>(
   'user/addParking',
   (parking, {dispatch, extra: api}) => {
-    console.log('добавка!!!');
     const parkingList = useLocalStorage();
     parkingList.unshift(parking);
     localStorage.setItem('parkingList', JSON.stringify(parkingList));
@@ -185,8 +184,6 @@ export const editParkingAction = createAsyncThunk<void, TParking, {
 }>(
   'user/editParking',
   (editElement, {dispatch, extra: api}) => {
-    console.log('меняем все!!!');
-    console.log(editElement);
     const parkingList = useLocalStorage();
 
     const editElementIndex = parkingList.findIndex ((item) => item.id === editElement.id);
