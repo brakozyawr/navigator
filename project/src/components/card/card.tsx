@@ -1,9 +1,9 @@
 import {Link} from 'react-router-dom';
 
-import {AppRoute} from '../../const';
+import {AppRoute, AuthorizationStatus} from '../../const';
 import {TParking} from '../../types/types';
 import {convertRating} from '../../util';
-import {useAppDispatch} from '../../hooks';
+import {useAppDispatch, useAppSelector} from '../../hooks';
 import {deleteParkingAction} from '../../store/api-actions';
 
 type CardProps = {
@@ -15,6 +15,7 @@ type CardProps = {
 const Card = ({parking, onMouseOverHandler, main}: CardProps): JSX.Element =>{
   const className = main ? 'cities' : 'near-places';
   const dispatch = useAppDispatch();
+  const {authorizationStatus} = useAppSelector((state) => state);
 
   return(
     <article
@@ -43,17 +44,18 @@ const Card = ({parking, onMouseOverHandler, main}: CardProps): JSX.Element =>{
             </div>
           </div>}
       </div>
-      <button
-        className="cross-btn"
-        type="button"
-        title="Удалить элемент"
-        aria-label="Закрыть попап"
-        onClick={() => {
-          dispatch(deleteParkingAction(parking.id));
-        }}
-      >
+      {authorizationStatus === AuthorizationStatus.Auth &&
+        <button
+          className="cross-btn"
+          type="button"
+          title="Удалить элемент"
+          aria-label="Закрыть попап"
+          onClick={() => {
+            dispatch(deleteParkingAction(parking.id));
+          }}
+        >
         ×
-      </button>
+        </button>}
     </article>
   );};
 
